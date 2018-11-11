@@ -62,10 +62,10 @@ def tracker_eval(net, x_crop, target_pos, target_sz, window, scale_z, p):
     delta = delta.permute(1, 2, 3, 0).contiguous().view(4, -1).data.cpu().numpy()
     score = F.softmax(score.permute(1, 2, 3, 0).contiguous().view(2, -1), dim=0).data[1, :].cpu().numpy()
 
-    delta[0, :] = delta[0, :] * p.anchor[:, 2] + p.anchor[:, 0]
-    delta[1, :] = delta[1, :] * p.anchor[:, 3] + p.anchor[:, 1]
-    delta[2, :] = np.exp(delta[2, :]) * p.anchor[:, 2]
-    delta[3, :] = np.exp(delta[3, :]) * p.anchor[:, 3]
+    delta[0, :] = delta[0, :] * p.anchor[:, 2] + p.anchor[:, 0] # Tx = delta_0 * Aw + Ax
+    delta[1, :] = delta[1, :] * p.anchor[:, 3] + p.anchor[:, 1] # Ty = delta_1 * Ah + Ay
+    delta[2, :] = np.exp(delta[2, :]) * p.anchor[:, 2]          # Tw = exp(delta_2) * Aw
+    delta[3, :] = np.exp(delta[3, :]) * p.anchor[:, 3]          # Th = exp(delta_3) * Ah
 
     def change(r):
         return np.maximum(r, 1./r)
